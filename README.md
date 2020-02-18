@@ -1,16 +1,12 @@
-# go-nats
+![](https://raw.githubusercontent.com/nats-io/nats-site/master/src/img/large-logo.png)
 
-1. Run NATS server using the following command
-`docker run -p 4222:4222 -p 8222:8222 nats:alpine3.10`
+# NATS and NATS Streaming Examples
 
-2. Run subscriber and give subject
-```
-cd subscriber
-go run main.go hello
-```
+# Overview
+This repo contains go-gettable nats.go examples using NATS and NATS Streaming.
 
-3. Run publisher and specify subject and message
-```
-cd publisher
-go run main.go hello world
-```
+# Nats
+The nats directory implement [Publish/Subscribe](/nats) pattern
+
+# Nats Server
+The nats directory implement [Durable Subscriber with NATS Streaming](/nats-streaming)
