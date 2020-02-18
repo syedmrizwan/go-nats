@@ -24,7 +24,7 @@ func startSubscriber(conn stan.Conn, wg *sync.WaitGroup, n int, d chan<- struct{
 		sub stan.Subscription
 	)
 
-	sub, err = conn.Subscribe("counter", func(msg *stan.Msg) {
+	sub, err = conn.Subscribe("counter-channel", func(msg *stan.Msg) {
 		// Print the value and whether it was redelivered.
 		fmt.Printf("seq = %d [redelivered = %v]\n", msg.Sequence, msg.Redelivered)
 
@@ -56,8 +56,8 @@ func main() {
 
 func run() error {
 	conn, err := stan.Connect(
-		"test-cluster",
-		"test-client",
+		"cluster1",    //cluster ID should be the same as provided while running the NATS streaming server. Default is "test-cluster"
+		"test-client", // need to give unique ID
 		stan.NatsURL("nats://localhost:4222"),
 	)
 	defer conn.Close()

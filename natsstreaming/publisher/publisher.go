@@ -14,8 +14,8 @@ func main() {
 
 func run() error {
 	conn, err := stan.Connect(
-		"test-cluster",
-		"test-client1",
+		"cluster1",//cluster ID should be the same as provided while running the NATS streaming server. Default is "test-cluster"
+		"test-client1",// need to give unique ID
 		stan.NatsURL("nats://localhost:4222"),
 	)
 	if err != nil {
@@ -25,7 +25,7 @@ func run() error {
 
 	// Publish up to 10.
 	for i := 0; i < 10; i++ {
-		err := conn.Publish("counter", nil)
+		err := conn.Publish("counter-channel", nil)
 		if err != nil {
 			return err
 		}
