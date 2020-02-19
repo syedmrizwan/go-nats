@@ -1,6 +1,6 @@
 # Durable Subscriber with NATS Streaming
 
-With this example, a subscriber is disconnected after 5 messages, reconnects and processes the remaining messages.
+With this example, a publisher writes 10 messages and the subscriber reads the messages and guarantee durability
 
 1. Run NATS streaming server using the following command. 
 

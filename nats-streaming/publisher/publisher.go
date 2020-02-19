@@ -1,9 +1,10 @@
 package main
 
 import (
-	"log"
-
+	"fmt"
+	nats "github.com/nats-io/nats.go"
 	stan "github.com/nats-io/stan.go"
+	"log"
 )
 
 func main() {
@@ -13,10 +14,16 @@ func main() {
 }
 
 func run() error {
+	// cluster ID should be the same as provided while running the NATS streaming server. Default is "test-cluster"
+	clusterID := "cluster1"
+	// clientID should be unique
+	clientID := "test-client1"
+	// Channel subject
+	channelSubject := "subject"
 	conn, err := stan.Connect(
-		"cluster1",//cluster ID should be the same as provided while running the NATS streaming server. Default is "test-cluster"
-		"test-client1",// need to give unique ID
-		stan.NatsURL("nats://localhost:4222"),
+		clusterID,
+		clientID,
+		stan.NatsURL(nats.DefaultURL),
 	)
 	if err != nil {
 		return err
@@ -25,14 +32,11 @@ func run() error {
 
 	// Publish up to 10.
 	for i := 0; i < 10; i++ {
-		err := conn.Publish("counter-channel", nil)
+		err := conn.Publish(channelSubject, []byte(fmt.Sprintf("%s %d", "Hello", i)))
 		if err != nil {
 			return err
 		}
 	}
-
-	// Wait until all messages have been processed.
-	//wg.Wait()
 
 	return nil
 }

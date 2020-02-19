@@ -2,51 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
-	"math/rand"
-	"sync"
-	"time"
+	"runtime"
 
+	nats "github.com/nats-io/nats.go"
 	stan "github.com/nats-io/stan.go"
 )
-
-func logCloser(c io.Closer) {
-	if err := c.Close(); err != nil {
-		log.Printf("close error: %s", err)
-	}
-}
-
-func startSubscriber(conn stan.Conn, wg *sync.WaitGroup, n int, d chan<- struct{}) {
-	var (
-		i   int
-		err error
-		sub stan.Subscription
-	)
-
-	sub, err = conn.Subscribe("counter-channel", func(msg *stan.Msg) {
-		// Print the value and whether it was redelivered.
-		fmt.Printf("seq = %d [redelivered = %v]\n", msg.Sequence, msg.Redelivered)
-
-		// Add jitter..
-		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
-
-		// Mark it is done.
-		wg.Done()
-
-		i++
-
-		msg.Ack()
-
-		if i == n {
-			sub.Close()
-			d <- struct{}{}
-		}
-	}, stan.DurableName("i-will-remember"), stan.MaxInflight(1), stan.SetManualAckMode())
-	if err != nil {
-		log.Print(err)
-	}
-}
 
 func main() {
 	if err := run(); err != nil {
@@ -55,36 +16,26 @@ func main() {
 }
 
 func run() error {
+	//cluster ID should be the same as provided while running the NATS streaming server. Default is "test-cluster"
+	clusterID := "cluster1"
+	// clientID should be unique
+	clientID := "test-client"
+	// Channel subject
+	channelSubject := "subject"
 	conn, err := stan.Connect(
-		"cluster1",    //cluster ID should be the same as provided while running the NATS streaming server. Default is "test-cluster"
-		"test-client", // need to give unique ID
-		stan.NatsURL("nats://localhost:4222"),
+		clusterID, 
+		clientID,  
+		stan.NatsURL(nats.DefaultURL),
 	)
-	defer conn.Close()
-
 	if err != nil {
 		return err
 	}
-	defer logCloser(conn)
 
-	wg := &sync.WaitGroup{}
+	conn.Subscribe(channelSubject, func(msg *stan.Msg) {
+		// Print the value and whether it was redelivered.
+		fmt.Printf("message = %s seq = %d [redelivered = %v]\n", string(msg.Data), msg.Sequence, msg.Redelivered)
+	}, stan.DurableName("i-will-remember"))
 
-	go func() {
-		done := make(chan struct{})
-		startSubscriber(conn, wg, 5, done)
-		<-done
-		log.Print("subscriber disconnected..")
-		log.Print("reconnecting..")
-		startSubscriber(conn, wg, 5, done)
-	}()
-
-	// Publish up to 10.
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-	}
-
-	// Wait until all messages have been processed.
-	wg.Wait()
-
+	runtime.Goexit()
 	return nil
 }
