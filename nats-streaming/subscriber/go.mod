@@ -1,4 +1,4 @@
-module listener
+module subscriber
 
 go 1.13
 

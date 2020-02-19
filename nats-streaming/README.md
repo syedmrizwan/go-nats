@@ -8,10 +8,10 @@ With this example, a subscriber is disconnected after 5 messages, reconnects and
 
     Name used after `--cluster_id` flag will be needed to establish a connection. Default cluster_id is `test-cluster`
 
-2. Run listener
+2. Run subscriber
     ```
-    cd listener
-    go run listener.go
+    cd subscriber
+    go run subscriber.go
     ```
 
 3. Run publisher 
