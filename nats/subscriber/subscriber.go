@@ -1,74 +1,40 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"runtime"
 	"time"
 
-	"github.com/nats-io/go-nats"
+	nats "github.com/nats-io/nats.go"
 )
-
-// NOTE: Can test with demo servers.
-// nats-sub -s demo.nats.io <subject>
-// nats-sub -s demo.nats.io:4443 <subject> (TLS version)
-
-func usage() {
-	log.Printf("Usage: nats-sub [-s server] [-creds file] [-t] <subject>\n")
-	flag.PrintDefaults()
-}
 
 func printMsg(m *nats.Msg, i int) {
 	log.Printf("[#%d] Received on [%s]: '%s'", i, m.Subject, string(m.Data))
 }
-
 func main() {
-	var urls = flag.String("s", nats.DefaultURL, "The nats server URLs (separated by comma)")
-	var userCreds = flag.String("creds", "", "User Credentials File")
-	var showTime = flag.Bool("t", false, "Display timestamps")
-
-	log.SetFlags(0)
-	flag.Usage = usage
-	flag.Parse()
-
-	args := flag.Args()
-	if len(args) != 1 {
-		usage()
-	}
-
 	// Connect Options.
 	opts := []nats.Option{nats.Name("NATS Sample Subscriber")}
 	opts = setupConnOptions(opts)
 
-	// Use UserCredentials
-	if *userCreds != "" {
-		opts = append(opts, nats.UserCredentials(*userCreds))
-	}
-
 	// Connect to NATS
-	nc, err := nats.Connect(*urls, opts...)
+	nc, err := nats.Connect(nats.DefaultURL, opts...)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	subj, i := args[0], 0
+	// Channel subject
+	channelSubject := "channelsubject"
 
-	nc.Subscribe(subj, func(msg *nats.Msg) {
-		i += 1
+	i := 0
+	//Subscriber
+	nc.Subscribe(channelSubject, func(msg *nats.Msg) {
+		i++
 		printMsg(msg, i)
 	})
 	nc.Flush()
-
-	if err := nc.LastError(); err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("Listening on [%s]", subj)
-	if *showTime {
-		log.SetFlags(log.LstdFlags)
-	}
-
+	// Keep the connection alive
 	runtime.Goexit()
+
 }
 
 func setupConnOptions(opts []nats.Option) []nats.Option {
