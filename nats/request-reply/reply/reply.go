@@ -30,7 +30,7 @@ func main() {
 	log.Printf("Listening on [%s]", channelSubject)
 	i := 0
 	//Subscriber
-	nc.QueueSubscribe(channelSubject, "NATS-RPLY-22", func(msg *nats.Msg) {
+	nc.Subscribe(channelSubject, func(msg *nats.Msg) {
 		i++
 		printMsg(msg, i)
 		msg.Respond([]byte(reply))

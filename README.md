@@ -8,6 +8,7 @@ This repo contains go-gettable nats.go examples using NATS and NATS Streaming.
 # Nats
 The nats directory implements
 1. [Publish/Subscribe](/nats/pub-sub) pattern
+2. [Request/Reply](/nats/request-reply) pattern
 
 # Nats Server
 The nats directory implement [Durable Subscriber with NATS Streaming](/nats-streaming)
