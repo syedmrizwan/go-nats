@@ -34,7 +34,8 @@ func run() error {
 	conn.Subscribe(channelSubject, func(msg *stan.Msg) {
 		// Print the value and whether it was redelivered.
 		fmt.Printf("message = %s seq = %d [redelivered = %v]\n", string(msg.Data), msg.Sequence, msg.Redelivered)
-	}, stan.DurableName("i-will-remember"))
+		msg.Ack()
+	}, stan.SetManualAckMode(), stan.AckWait(stan.DefaultAckWait), stan.DurableName("i-will-remember"))
 
 	runtime.Goexit()
 	return nil
