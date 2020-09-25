@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	nats "github.com/nats-io/nats.go"
 	stan "github.com/nats-io/stan.go"
-	"log"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func run() error {
 	// cluster ID should be the same as provided while running the NATS streaming server. Default is "test-cluster"
 	clusterID := "cluster1"
 	// clientID should be unique
-	clientID := "test-client1"
+	clientID := "test-client"
 	// Channel subject
 	channelSubject := "subject"
 	conn, err := stan.Connect(

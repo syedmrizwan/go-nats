@@ -8,10 +8,10 @@ With this example, a publisher writes 10 messages and the subscriber reads the m
 
     Name used after `--cluster_id` flag will be needed to establish a connection. Default cluster_id is `test-cluster`
 
-2. Run subscriber
+2. Run subscriber by specifying client id
     ```
     cd subscriber
-    go run subscriber.go
+    go run subscriber.go -client=test-client-2
     ```
 
 3. Run publisher 
