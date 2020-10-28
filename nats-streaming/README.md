@@ -1,6 +1,6 @@
 # Durable Subscriber with NATS Streaming
 
-With this example, a publisher writes 10 messages and the subscriber reads the messages and guarantee durability
+With this example, a publisher writes 10 messages and the subscriber reads the messages via queue subscribe
 
 1. Run NATS streaming server using the following command. 
 

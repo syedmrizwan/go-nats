@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"runtime"
-	"time"
 
 	nats "github.com/nats-io/nats.go"
 	stan "github.com/nats-io/stan.go"
@@ -27,10 +26,12 @@ func run(clientID string) error {
 
 	// Channel subject
 	channelSubject := "subject"
+
+	nc, _ := nats.Connect(nats.DefaultURL, nats.MaxReconnects(10))
 	conn, err := stan.Connect(
 		clusterID,
 		clientID,
-		stan.NatsURL(nats.DefaultURL),
+		stan.NatsConn(nc),
 	)
 	if err != nil {
 		return err
@@ -39,7 +40,7 @@ func run(clientID string) error {
 	conn.QueueSubscribe(channelSubject, "Queue1", func(msg *stan.Msg) {
 		// Print the value and whether it was redelivered.
 		fmt.Printf("message = %s seq = %d [redelivered = %v]\n", string(msg.Data), msg.Sequence, msg.Redelivered)
-		time.Sleep(10 * time.Second)
+		//time.Sleep(1 * time.Second)
 		msg.Ack()
 	}, stan.SetManualAckMode(), stan.AckWait(stan.DefaultAckWait), stan.DurableName("i-will-remember"))
 
